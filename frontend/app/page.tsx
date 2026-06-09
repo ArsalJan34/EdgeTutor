@@ -3,63 +3,111 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Animated background grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
-      {/* Glow orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
+    <main className="min-h-screen bg-[#0c0c0c] text-[#f0ede8] flex flex-col relative overflow-hidden">
 
-      <div className="relative z-10 text-center px-6 max-w-3xl">
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      {/* Ember glow */}
+      <div className="absolute bottom-0 left-0 w-[600px] h-[400px] pointer-events-none"
+        style={{background: "radial-gradient(ellipse at 0% 100%, rgba(232,132,74,0.08) 0%, transparent 60%)"}} />
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] pointer-events-none"
+        style={{background: "radial-gradient(ellipse at 100% 0%, rgba(232,132,74,0.04) 0%, transparent 60%)"}} />
+
+      {/* NAVBAR */}
+      <nav className="relative z-20 flex items-center justify-between px-6 sm:px-10 py-5 border-b border-white/[0.06]">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 flex items-center justify-center">
+            <svg width="20" height="24" viewBox="0 0 20 24" fill="none">
+              <path d="M10 0C10 0 15 6 15 11C15 13.76 13.21 16.08 10.7 16.79C11.13 15.95 11.38 15 11.38 14C11.38 11.5 9.5 9.5 7.5 8C7.5 8 8 11 6.5 13C5.5 14.5 4 15.5 4 17.5C4 20.54 6.69 23 10 23C13.31 23 16 20.54 16 17.5C16 14.83 14.09 12.62 11.5 12C12.2 10.67 12.5 9.17 12.5 7.5C12.5 4.81 11.09 2.5 10 0Z" fill="url(#flameGrad)" />
+              <defs>
+                <linearGradient id="flameGrad" x1="10" y1="0" x2="10" y2="24" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#f5a55a"/><stop offset="1" stopColor="#c4622a"/>
+                </linearGradient>
+              </defs>
             </svg>
           </div>
-          <span className="text-2xl font-bold tracking-tight font-mono text-emerald-400">EdgeTutor</span>
-        </div>
-
-        <h1 className="text-5xl md:text-6xl font-black mb-4 leading-tight tracking-tight">
-          Your AI-Powered
-          <span className="block bg-gradient-to-r from-red-400 via-emerald-400 to-green-400 bg-clip-text text-transparent">
-            Study Assistant
+          <span className="text-[15px] font-bold tracking-[0.12em] uppercase text-[#f0ede8]"
+            style={{fontFamily: "var(--font-geist-mono)"}}>
+            EdgeTutor
           </span>
-        </h1>
-        <p className="text-gray-400 text-lg mb-12 leading-relaxed">
-          Upload your notes and textbooks. Ask anything. Get instant, context-aware answers powered by AI.
-        </p>
-
-        {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-          <Link href="/upload" className="group bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-emerald-500/10 hover:border-emarald-500/40 transition-all duration-300 cursor-pointer">
-            <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-500/30 transition-colors">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
-            </div>
-            <h2 className="text-white font-bold text-lg mb-1">Upload PDF</h2>
-            <p className="text-gray-400 text-sm">Upload lecture notes, textbooks, or any study material.</p>
-            <div className="mt-4 text-emarald-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-              Get started <span>→</span>
-            </div>
+        </div>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link href="/upload"
+            className="hidden sm:flex items-center gap-1.5 text-xs font-medium tracking-widest uppercase text-[#a39d97] hover:text-[#f0ede8] transition-colors duration-200 px-4 py-2 border border-white/[0.08] hover:border-white/20 rounded-sm">
+            Upload
           </Link>
-
-          <Link href="/chat" className="group bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-teal-500/10 hover:border-teal-500/40 transition-all duration-300 cursor-pointer">
-            <div className="w-10 h-10 bg-violet-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:bg-teal-500/30 transition-colors">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
-            </div>
-            <h2 className="text-white font-bold text-lg mb-1">Ask AI Tutor</h2>
-            <p className="text-gray-400 text-sm">Ask questions and get intelligent answers from your documents.</p>
-            <div className="mt-4 text-violet-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-              Start chatting <span>→</span>
-            </div>
+          <Link href="/chat"
+            className="flex items-center gap-1.5 text-xs font-medium tracking-widest uppercase bg-[#e8844a] hover:bg-[#f09558] text-[#0c0c0c] transition-colors duration-200 px-4 py-2 rounded-sm">
+            Chat
           </Link>
         </div>
-      </div>
+      </nav>
+
+      {/* HERO */}
+      <section className="relative z-10 flex flex-col items-start justify-center flex-1 px-6 sm:px-10 lg:px-16 pt-16 pb-12 max-w-6xl w-full mx-auto">
+        <div className="mb-6">
+          <span className="inline-block text-[10px] font-medium tracking-[0.25em] uppercase text-[#e8844a] border border-[#e8844a]/30 px-3 py-1.5 rounded-sm">
+            AI-Powered Learning
+          </span>
+        </div>
+        <h1 className="text-[clamp(2.8rem,8vw,6.5rem)] font-black leading-[0.92] tracking-[-0.03em] text-[#f0ede8] mb-6 uppercase max-w-4xl">
+          Study Smarter.<br />
+          <span style={{color: "#e8844a"}}>Ask Anything.</span>
+        </h1>
+        <p className="text-[#6b6560] text-base sm:text-lg max-w-xl mb-10 leading-relaxed font-light">
+          Upload your notes and textbooks. EdgeTutor reads every page and gives you instant, context-aware answers like having a tutor who has read your entire syllabus.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <Link href="/upload"
+            className="flex items-center justify-center gap-2 px-8 py-4 bg-[#e8844a] hover:bg-[#f09558] text-[#0c0c0c] font-bold text-sm tracking-[0.12em] uppercase transition-all duration-200 rounded-sm w-full sm:w-auto">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Upload PDF
+          </Link>
+          <Link href="/chat"
+            className="flex items-center justify-center gap-2 px-8 py-4 border border-white/[0.12] hover:border-[#e8844a]/40 text-[#a39d97] hover:text-[#f0ede8] font-medium text-sm tracking-[0.12em] uppercase transition-all duration-200 rounded-sm w-full sm:w-auto">
+            Ask AI Tutor
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </Link>
+        </div>
+      </section>
+
+      {/* FEATURE STRIP */}
+      <section className="relative z-10 border-t border-white/[0.06] px-6 sm:px-10 lg:px-16 py-12 max-w-6xl w-full mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-white/[0.06]">
+          {[
+            { num: "01", label: "Upload", title: "Any PDF Document", desc: "Lecture notes, textbooks, past papers EdgeTutor indexes everything instantly.", href: "/upload" },
+            { num: "02", label: "Ask", title: "Natural Questions", desc: "Type exactly what you want to know. No rigid search queries required.", href: "/chat" },
+            { num: "03", label: "Learn", title: "In Context", desc: "Get answers grounded in your own material, not generic web results.", href: "/chat" },
+          ].map((f) => (
+            <Link key={f.num} href={f.href}
+              className="group bg-[#0c0c0c] hover:bg-[#141414] transition-colors duration-300 p-7 sm:p-8 flex flex-col gap-5 cursor-pointer">
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-medium tracking-[0.2em] text-[#e8844a]"
+                  style={{fontFamily: "var(--font-geist-mono)"}}>{f.num}</span>
+                <span className="text-[10px] tracking-[0.2em] uppercase text-[#3a3530]">{f.label}</span>
+              </div>
+              <div>
+                <h3 className="text-[#f0ede8] font-bold text-lg mb-2 tracking-tight group-hover:text-white transition-colors">{f.title}</h3>
+                <p className="text-[#6b6560] text-sm leading-relaxed">{f.desc}</p>
+              </div>
+              <div className="mt-auto flex items-center gap-1.5 text-xs text-[#3a3530] group-hover:text-[#e8844a] transition-colors duration-200">
+                <span className="tracking-[0.1em] uppercase font-medium">Explore</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform duration-200">
+                  <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="relative z-10 border-t border-white/[0.06] px-6 sm:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <span className="text-[11px] text-[#3a3530] tracking-[0.15em] uppercase font-medium">EdgeTutor</span>
+        <span className="text-[11px] text-[#2a2520]">RAG-powered document intelligence</span>
+      </footer>
     </main>
   );
 }

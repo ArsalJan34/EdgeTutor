@@ -9,14 +9,12 @@ interface Message {
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Hi! I'm EdgeTutor. Upload a PDF first, then ask me anything about it. I'll find the most relevant information for you.",
-    },
+    { role: "assistant", content: "Hi I'm EdgeTutor. Upload a PDF first, then ask me anything about it. I'll find the most relevant information for you." },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -25,113 +23,108 @@ export default function ChatPage() {
   const send = async () => {
     const q = input.trim();
     if (!q || loading) return;
-
     setMessages((prev) => [...prev, { role: "user", content: q }]);
     setInput("");
     setLoading(true);
-
+    if (textareaRef.current) textareaRef.current.style.height = "48px";
     try {
       const res = await fetch(`http://127.0.0.1:8000/chat?q=${encodeURIComponent(q)}`);
       const data = await res.json();
-
       if (res.ok) {
-        // Handle both {answer: "..."} and {context: [...]} responses
-        const reply =
-          data.answer ||
-          (Array.isArray(data.context) ? data.context.join("\n\n---\n\n") : JSON.stringify(data));
+        const reply = data.answer || (Array.isArray(data.context) ? data.context.join("\n\n---\n\n") : JSON.stringify(data));
         setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
       } else {
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: `Error: ${data.detail || "Something went wrong."}` },
-        ]);
+        setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${data.detail || "Something went wrong."}` }]);
       }
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Cannot connect to backend. Make sure it is running on port 8000.",
-        },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Cannot connect to backend. Make sure it is running on port 8000." }]);
     } finally {
       setLoading(false);
     }
   };
 
   const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      send();
-    }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+  };
+
+  const handleTextareaInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    const el = e.target;
+    el.style.height = "48px";
+    el.style.height = Math.min(el.scrollHeight, 120) + "px";
   };
 
   return (
-    <main className="h-screen bg-[#0a0a0f] text-white flex flex-col overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.02)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
+    <main className="h-screen bg-[#0c0c0c] text-[#f0ede8] flex flex-col overflow-hidden">
 
-      {/* Navbar */}
-      <nav className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
-        <Link href="/" className="flex items-center gap-2 text-indigo-300 font-mono font-bold">
-          <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      <div className="absolute bottom-0 left-0 w-[400px] h-[300px] pointer-events-none z-0"
+        style={{background: "radial-gradient(ellipse at 0% 100%, rgba(232,132,74,0.06) 0%, transparent 60%)"}} />
+
+      {/* NAVBAR */}
+      <nav className="relative z-20 flex items-center justify-between px-5 sm:px-8 py-4 border-b border-white/[0.06] shrink-0">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-7 h-7 flex items-center justify-center">
+            <svg width="16" height="20" viewBox="0 0 20 24" fill="none">
+              <path d="M10 0C10 0 15 6 15 11C15 13.76 13.21 16.08 10.7 16.79C11.13 15.95 11.38 15 11.38 14C11.38 11.5 9.5 9.5 7.5 8C7.5 8 8 11 6.5 13C5.5 14.5 4 15.5 4 17.5C4 20.54 6.69 23 10 23C13.31 23 16 20.54 16 17.5C16 14.83 14.09 12.62 11.5 12C12.2 10.67 12.5 9.17 12.5 7.5C12.5 4.81 11.09 2.5 10 0Z" fill="url(#fg3)"/>
+              <defs>
+                <linearGradient id="fg3" x1="10" y1="0" x2="10" y2="24" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#f5a55a"/><stop offset="1" stopColor="#c4622a"/>
+                </linearGradient>
+              </defs>
             </svg>
           </div>
-          EdgeTutor
+          <span className="text-[14px] font-bold tracking-[0.12em] uppercase text-[#f0ede8]"
+            style={{fontFamily: "var(--font-geist-mono)"}}>EdgeTutor</span>
         </Link>
-        <div className="flex items-center gap-3">
-          <Link href="/upload" className="text-xs text-gray-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link href="/upload"
+            className="text-[11px] font-medium tracking-[0.15em] uppercase text-[#6b6560] hover:text-[#f0ede8] transition-colors duration-200 px-3 py-1.5 border border-white/[0.07] hover:border-white/20 rounded-sm">
             + Upload PDF
           </Link>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span className="text-xs text-gray-500">AI Ready</span>
+            <div className="w-1.5 h-1.5 bg-[#e8844a] rounded-full animate-pulse" />
+            <span className="text-[11px] text-[#3a3530] hidden sm:block tracking-wider">AI Ready</span>
           </div>
         </div>
       </nav>
 
-      {/* Messages */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-4 py-6 space-y-4">
-        <div className="max-w-2xl mx-auto space-y-4">
+      {/* MESSAGES */}
+      <div className="relative z-10 flex-1 overflow-y-auto">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 space-y-6">
           {messages.map((msg, i) => (
             <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-              {/* Avatar */}
-              <div className={`shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold ${
-                msg.role === "assistant"
-                  ? "bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/20"
-                  : "bg-white/10 text-gray-300"
+              <div className={`shrink-0 w-7 h-7 rounded-sm flex items-center justify-center ${
+                msg.role === "assistant" ? "bg-[#1c1c1c] border border-[#e8844a]/30" : "bg-[#1c1c1c] border border-white/[0.08]"
               }`}>
                 {msg.role === "assistant" ? (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                  <svg width="12" height="14" viewBox="0 0 20 24" fill="none">
+                    <path d="M10 0C10 0 15 6 15 11C15 13.76 13.21 16.08 10.7 16.79C11.13 15.95 11.38 15 11.38 14C11.38 11.5 9.5 9.5 7.5 8C7.5 8 8 11 6.5 13C5.5 14.5 4 15.5 4 17.5C4 20.54 6.69 23 10 23C13.31 23 16 20.54 16 17.5C16 14.83 14.09 12.62 11.5 12C12.2 10.67 12.5 9.17 12.5 7.5C12.5 4.81 11.09 2.5 10 0Z" fill="#e8844a"/>
                   </svg>
-                ) : "U"}
+                ) : (
+                  <span className="text-[#6b6560] text-[10px] font-bold">U</span>
+                )}
               </div>
-
-              {/* Bubble */}
-              <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+              <div className={`max-w-[82%] sm:max-w-[75%] px-4 py-3 rounded-sm text-sm leading-relaxed whitespace-pre-wrap ${
                 msg.role === "assistant"
-                  ? "bg-white/5 border border-white/8 text-gray-200 rounded-tl-sm"
-                  : "bg-indigo-500/20 border border-indigo-500/20 text-white rounded-tr-sm"
+                  ? "bg-[#141414] border border-white/[0.06] text-[#c8c3bc]"
+                  : "bg-[#1c1c1c] border border-white/[0.06] text-[#f0ede8]"
               }`}>
                 {msg.content}
               </div>
             </div>
           ))}
 
-          {/* Loading indicator */}
           {loading && (
             <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shrink-0">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+              <div className="shrink-0 w-7 h-7 rounded-sm bg-[#1c1c1c] border border-[#e8844a]/30 flex items-center justify-center">
+                <svg width="12" height="14" viewBox="0 0 20 24" fill="none">
+                  <path d="M10 0C10 0 15 6 15 11C15 13.76 13.21 16.08 10.7 16.79C11.13 15.95 11.38 15 11.38 14C11.38 11.5 9.5 9.5 7.5 8C7.5 8 8 11 6.5 13C5.5 14.5 4 15.5 4 17.5C4 20.54 6.69 23 10 23C13.31 23 16 20.54 16 17.5C16 14.83 14.09 12.62 11.5 12C12.2 10.67 12.5 9.17 12.5 7.5C12.5 4.81 11.09 2.5 10 0Z" fill="#e8844a"/>
                 </svg>
               </div>
-              <div className="bg-white/5 border border-white/8 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0ms]" />
-                <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:150ms]" />
-                <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:300ms]" />
+              <div className="bg-[#141414] border border-white/[0.06] rounded-sm px-4 py-3 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-[#e8844a] rounded-full animate-bounce [animation-delay:0ms]" />
+                <span className="w-1.5 h-1.5 bg-[#e8844a] rounded-full animate-bounce [animation-delay:120ms]" />
+                <span className="w-1.5 h-1.5 bg-[#e8844a] rounded-full animate-bounce [animation-delay:240ms]" />
               </div>
             </div>
           )}
@@ -139,29 +132,36 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Input */}
-      <div className="relative z-10 px-4 pb-6 pt-3 border-t border-white/5 shrink-0">
-        <div className="max-w-2xl mx-auto flex gap-3">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKey}
-            placeholder="Ask a question about your document..."
-            rows={1}
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 resize-none focus:outline-none focus:border-indigo-500/50 focus:bg-indigo-500/5 transition-all"
-            style={{ minHeight: "48px", maxHeight: "120px" }}
-          />
-          <button
-            onClick={send}
-            disabled={!input.trim() || loading}
-            className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:from-indigo-400 hover:to-violet-500 transition-all shadow-lg shadow-indigo-500/20 shrink-0"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
-          </button>
+      {/* INPUT */}
+      <div className="relative z-10 shrink-0 border-t border-white/[0.06] bg-[#0c0c0c] px-4 sm:px-6 py-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex gap-2 items-end">
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={handleTextareaInput}
+              onKeyDown={handleKey}
+              placeholder="Ask a question about your document..."
+              className="flex-1 bg-[#141414] border border-white/[0.08] focus:border-[#e8844a]/40 rounded-sm px-4 py-3 text-sm text-[#f0ede8] placeholder-[#3a3530] resize-none focus:outline-none transition-colors duration-200"
+              style={{ minHeight: "48px", maxHeight: "120px" }}
+            />
+            <button
+              onClick={send}
+              disabled={!input.trim() || loading}
+              className="w-12 h-12 rounded-sm flex items-center justify-center transition-all duration-200 shrink-0 disabled:opacity-25 disabled:cursor-not-allowed"
+              style={{ background: input.trim() && !loading ? "#e8844a" : "#1a1a1a" }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke={input.trim() && !loading ? "#0c0c0c" : "#3a3530"}
+                strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </div>
+          <p className="text-center text-[#2a2520] text-[10px] mt-2 tracking-wider">
+            Enter to send · Shift+Enter for new line
+          </p>
         </div>
-        <p className="text-center text-gray-700 text-xs mt-2">Press Enter to send · Shift+Enter for new line</p>
       </div>
     </main>
   );

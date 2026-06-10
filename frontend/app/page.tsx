@@ -5,7 +5,6 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#0c0c0c] text-[#f0ede8] flex flex-col relative overflow-hidden">
 
-      {/* Ember glow */}
       <div className="absolute bottom-0 left-0 w-[600px] h-[400px] pointer-events-none"
         style={{background: "radial-gradient(ellipse at 0% 100%, rgba(232,132,74,0.08) 0%, transparent 60%)"}} />
       <div className="absolute top-0 right-0 w-[400px] h-[400px] pointer-events-none"
@@ -25,9 +24,7 @@ export default function Home() {
             </svg>
           </div>
           <span className="text-[15px] font-bold tracking-[0.12em] uppercase text-[#f0ede8]"
-            style={{fontFamily: "var(--font-geist-mono)"}}>
-            EdgeTutor
-          </span>
+            style={{fontFamily: "var(--font-geist-mono)"}}>EdgeTutor</span>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <Link href="/upload"
@@ -73,13 +70,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURE STRIP */}
+      {/* FEATURE STRIP now 4 cards */}
       <section className="relative z-10 border-t border-white/[0.06] px-6 sm:px-10 lg:px-16 py-12 max-w-6xl w-full mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-white/[0.06]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/[0.06]">
           {[
-            { num: "01", label: "Upload", title: "Any PDF Document", desc: "Lecture notes, textbooks, past papers EdgeTutor indexes everything instantly.", href: "/upload" },
-            { num: "02", label: "Ask", title: "Natural Questions", desc: "Type exactly what you want to know. No rigid search queries required.", href: "/chat" },
-            { num: "03", label: "Learn", title: "In Context", desc: "Get answers grounded in your own material, not generic web results.", href: "/chat" },
+            { num: "01", label: "Upload", title: "Any PDF Document", desc: "Lecture notes, textbooks, past papers indexed instantly.", href: "/upload" },
+            { num: "02", label: "Tutor", title: "Direct Answers", desc: "Ask questions, get clear answers grounded in your material.", href: "/chat" },
+            { num: "03", label: "Socratic", title: "Guided Learning", desc: "Switch to Socratic mode the AI asks you questions instead.", href: "/chat" },
+            { num: "04", label: "Quiz", title: "Test Yourself", desc: "Auto-generate MCQ quizzes from your uploaded document.", href: "/quiz" },
           ].map((f) => (
             <Link key={f.num} href={f.href}
               className="group bg-[#0c0c0c] hover:bg-[#141414] transition-colors duration-300 p-7 sm:p-8 flex flex-col gap-5 cursor-pointer">
@@ -103,7 +101,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer className="relative z-10 border-t border-white/[0.06] px-6 sm:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
         <span className="text-[11px] text-[#3a3530] tracking-[0.15em] uppercase font-medium">EdgeTutor</span>
         <span className="text-[11px] text-[#2a2520]">RAG-powered document intelligence</span>

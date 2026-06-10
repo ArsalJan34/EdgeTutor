@@ -7,18 +7,31 @@ interface Message {
   content: string;
 }
 
+type Mode = "tutor" | "socratic";
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hi I'm EdgeTutor. Upload a PDF first, then ask me anything about it. I'll find the most relevant information for you." },
+    { role: "assistant", content: "Hi — I'm EdgeTutor. Upload a PDF first, then ask me anything about it." },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<Mode>("tutor");
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  // Inject a system message when mode changes (after first load)
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    const notice = mode === "socratic"
+      ? "Switched to Socratic mode — I'll guide you with questions instead of giving direct answers."
+      : "Switched to Tutor mode — I'll answer your questions directly.";
+    setMessages((prev) => [...prev, { role: "assistant", content: notice }]);
+  }, [mode]);
 
   const send = async () => {
     const q = input.trim();
@@ -27,12 +40,12 @@ export default function ChatPage() {
     setInput("");
     setLoading(true);
     if (textareaRef.current) textareaRef.current.style.height = "48px";
+
     try {
-      const res = await fetch(`http://127.0.0.1:8000/chat?q=${encodeURIComponent(q)}`);
+      const res = await fetch(`http://127.0.0.1:8000/chat?q=${encodeURIComponent(q)}&mode=${mode}`);
       const data = await res.json();
       if (res.ok) {
-        const reply = data.answer || (Array.isArray(data.context) ? data.context.join("\n\n---\n\n") : JSON.stringify(data));
-        setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+        setMessages((prev) => [...prev, { role: "assistant", content: data.answer }]);
       } else {
         setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${data.detail || "Something went wrong."}` }]);
       }
@@ -56,7 +69,6 @@ export default function ChatPage() {
 
   return (
     <main className="h-screen bg-[#0c0c0c] text-[#f0ede8] flex flex-col overflow-hidden">
-
       <div className="absolute bottom-0 left-0 w-[400px] h-[300px] pointer-events-none z-0"
         style={{background: "radial-gradient(ellipse at 0% 100%, rgba(232,132,74,0.06) 0%, transparent 60%)"}} />
 
@@ -76,17 +88,58 @@ export default function ChatPage() {
           <span className="text-[14px] font-bold tracking-[0.12em] uppercase text-[#f0ede8]"
             style={{fontFamily: "var(--font-geist-mono)"}}>EdgeTutor</span>
         </Link>
+
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* MODE TOGGLE */}
+          <div className="flex items-center border border-white/[0.08] rounded-sm overflow-hidden">
+            <button
+              onClick={() => setMode("tutor")}
+              className={`text-[11px] font-medium tracking-[0.12em] uppercase px-3 py-1.5 transition-colors duration-200 ${
+                mode === "tutor"
+                  ? "bg-[#e8844a] text-[#0c0c0c]"
+                  : "text-[#6b6560] hover:text-[#f0ede8]"
+              }`}>
+              Tutor
+            </button>
+            <button
+              onClick={() => setMode("socratic")}
+              className={`text-[11px] font-medium tracking-[0.12em] uppercase px-3 py-1.5 transition-colors duration-200 border-l border-white/[0.08] ${
+                mode === "socratic"
+                  ? "bg-[#e8844a] text-[#0c0c0c]"
+                  : "text-[#6b6560] hover:text-[#f0ede8]"
+              }`}>
+              Socratic
+            </button>
+          </div>
+
           <Link href="/upload"
-            className="text-[11px] font-medium tracking-[0.15em] uppercase text-[#6b6560] hover:text-[#f0ede8] transition-colors duration-200 px-3 py-1.5 border border-white/[0.07] hover:border-white/20 rounded-sm">
-            + Upload PDF
+            className="hidden sm:block text-[11px] font-medium tracking-[0.15em] uppercase text-[#6b6560] hover:text-[#f0ede8] transition-colors duration-200 px-3 py-1.5 border border-white/[0.07] hover:border-white/20 rounded-sm">
+            + Upload
           </Link>
+
+          <Link href="/quiz"
+            className="text-[11px] font-medium tracking-[0.15em] uppercase text-[#6b6560] hover:text-[#f0ede8] transition-colors duration-200 px-3 py-1.5 border border-white/[0.07] hover:border-white/20 rounded-sm">
+            Quiz
+          </Link>
+
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 bg-[#e8844a] rounded-full animate-pulse" />
             <span className="text-[11px] text-[#3a3530] hidden sm:block tracking-wider">AI Ready</span>
           </div>
         </div>
       </nav>
+
+      {/* Mode banner */}
+      {mode === "socratic" && (
+        <div className="relative z-10 shrink-0 bg-[#e8844a]/5 border-b border-[#e8844a]/15 px-5 sm:px-8 py-2 flex items-center gap-2">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#e8844a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span className="text-[11px] text-[#e8844a] tracking-wider">
+            Socratic mode — the AI will guide you with questions rather than direct answers
+          </span>
+        </div>
+      )}
 
       {/* MESSAGES */}
       <div className="relative z-10 flex-1 overflow-y-auto">
@@ -141,7 +194,7 @@ export default function ChatPage() {
               value={input}
               onChange={handleTextareaInput}
               onKeyDown={handleKey}
-              placeholder="Ask a question about your document..."
+              placeholder={mode === "socratic" ? "Ask something — I'll guide you to the answer..." : "Ask a question about your document..."}
               className="flex-1 bg-[#141414] border border-white/[0.08] focus:border-[#e8844a]/40 rounded-sm px-4 py-3 text-sm text-[#f0ede8] placeholder-[#3a3530] resize-none focus:outline-none transition-colors duration-200"
               style={{ minHeight: "48px", maxHeight: "120px" }}
             />

@@ -2,7 +2,6 @@ from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 from store import get_collection
 import requests
-import json
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -31,8 +30,7 @@ def store_pdf(pdf_file, collection_name: str):
     )
     return len(chunks)
 
-def query_docs(question: str, collection_name: str, top_k=3):
-    # Step 1 - get relevant chunks from ChromaDB
+def query_docs(question: str, collection_name: str, top_k: int = 3, mode: str = "tutor") -> str:
     collection = get_collection(collection_name)
     query_embedding = model.encode([question]).tolist()
     results = collection.query(
@@ -40,10 +38,21 @@ def query_docs(question: str, collection_name: str, top_k=3):
         n_results=top_k
     )
     chunks = results["documents"][0]
-
-    # Step 2 - build prompt with context
     context = "\n\n".join(chunks)
-    prompt = f"""You are EdgeTutor, an AI tutor. Use the context below to answer the student's question clearly and helpfully.
+
+    if mode == "socratic":
+        prompt = f"""You are EdgeTutor in Socratic mode. Your job is NOT to give the answer directly.
+Instead, guide the student to discover the answer themselves by asking 1-2 thoughtful questions.
+Use hints from the context below if needed. Keep your response under 4 sentences.
+
+Context from uploaded document:
+{context}
+
+Student question: {question}
+
+Respond with guiding questions only, do not reveal the answer:"""
+    else:
+        prompt = f"""You are EdgeTutor, an AI tutor. Use the context below to answer the student's question clearly and helpfully.
 
 Context from uploaded document:
 {context}
@@ -52,15 +61,9 @@ Student question: {question}
 
 Answer:"""
 
-    # Step 3 - send to Ollama
     response = requests.post(
         "http://localhost:11434/api/generate",
-        json={
-            "model": "gemma:2b",
-            "prompt": prompt,
-            "stream": False
-        }
+        json={"model": "gemma:2b", "prompt": prompt, "stream": False}
     )
 
-    result = response.json()
-    return result["response"]
+    return response.json()["response"]

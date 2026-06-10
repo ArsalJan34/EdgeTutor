@@ -18,17 +18,16 @@ export default function ChatPage() {
   const [mode, setMode] = useState<Mode>("tutor");
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Inject a system message when mode changes (after first load)
-  const isFirstRender = useRef(true);
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return; }
     const notice = mode === "socratic"
-      ? "Switched to Socratic mode — I'll guide you with questions instead of giving direct answers."
+      ? "Switched to Socratic mode — I'll guide you with questions instead of direct answers."
       : "Switched to Tutor mode — I'll answer your questions directly.";
     setMessages((prev) => [...prev, { role: "assistant", content: notice }]);
   }, [mode]);
@@ -40,7 +39,6 @@ export default function ChatPage() {
     setInput("");
     setLoading(true);
     if (textareaRef.current) textareaRef.current.style.height = "48px";
-
     try {
       const res = await fetch(`http://127.0.0.1:8000/chat?q=${encodeURIComponent(q)}&mode=${mode}`);
       const data = await res.json();
@@ -74,69 +72,58 @@ export default function ChatPage() {
 
       {/* NAVBAR */}
       <nav className="relative z-20 flex items-center justify-between px-5 sm:px-8 py-4 border-b border-white/[0.06] shrink-0">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-7 h-7 flex items-center justify-center">
-            <svg width="16" height="20" viewBox="0 0 20 24" fill="none">
-              <path d="M10 0C10 0 15 6 15 11C15 13.76 13.21 16.08 10.7 16.79C11.13 15.95 11.38 15 11.38 14C11.38 11.5 9.5 9.5 7.5 8C7.5 8 8 11 6.5 13C5.5 14.5 4 15.5 4 17.5C4 20.54 6.69 23 10 23C13.31 23 16 20.54 16 17.5C16 14.83 14.09 12.62 11.5 12C12.2 10.67 12.5 9.17 12.5 7.5C12.5 4.81 11.09 2.5 10 0Z" fill="url(#fg3)"/>
-              <defs>
-                <linearGradient id="fg3" x1="10" y1="0" x2="10" y2="24" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#f5a55a"/><stop offset="1" stopColor="#c4622a"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
+        <Link href="/" className="flex items-center gap-3">
+          <svg width="16" height="20" viewBox="0 0 20 24" fill="none">
+            <path d="M10 0C10 0 15 6 15 11C15 13.76 13.21 16.08 10.7 16.79C11.13 15.95 11.38 15 11.38 14C11.38 11.5 9.5 9.5 7.5 8C7.5 8 8 11 6.5 13C5.5 14.5 4 15.5 4 17.5C4 20.54 6.69 23 10 23C13.31 23 16 20.54 16 17.5C16 14.83 14.09 12.62 11.5 12C12.2 10.67 12.5 9.17 12.5 7.5C12.5 4.81 11.09 2.5 10 0Z" fill="url(#fg3)"/>
+            <defs>
+              <linearGradient id="fg3" x1="10" y1="0" x2="10" y2="24" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#f5a55a"/><stop offset="1" stopColor="#c4622a"/>
+              </linearGradient>
+            </defs>
+          </svg>
           <span className="text-[14px] font-bold tracking-[0.12em] uppercase text-[#f0ede8]"
             style={{fontFamily: "var(--font-geist-mono)"}}>EdgeTutor</span>
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* MODE TOGGLE */}
+          {/* Mode toggle */}
           <div className="flex items-center border border-white/[0.08] rounded-sm overflow-hidden">
-            <button
-              onClick={() => setMode("tutor")}
+            <button onClick={() => setMode("tutor")}
               className={`text-[11px] font-medium tracking-[0.12em] uppercase px-3 py-1.5 transition-colors duration-200 ${
-                mode === "tutor"
-                  ? "bg-[#e8844a] text-[#0c0c0c]"
-                  : "text-[#6b6560] hover:text-[#f0ede8]"
+                mode === "tutor" ? "bg-[#e8844a] text-[#0c0c0c]" : "text-[#6b6560] hover:text-[#f0ede8]"
               }`}>
               Tutor
             </button>
-            <button
-              onClick={() => setMode("socratic")}
+            <button onClick={() => setMode("socratic")}
               className={`text-[11px] font-medium tracking-[0.12em] uppercase px-3 py-1.5 transition-colors duration-200 border-l border-white/[0.08] ${
-                mode === "socratic"
-                  ? "bg-[#e8844a] text-[#0c0c0c]"
-                  : "text-[#6b6560] hover:text-[#f0ede8]"
+                mode === "socratic" ? "bg-[#e8844a] text-[#0c0c0c]" : "text-[#6b6560] hover:text-[#f0ede8]"
               }`}>
               Socratic
             </button>
           </div>
-
-          <Link href="/upload"
-            className="hidden sm:block text-[11px] font-medium tracking-[0.15em] uppercase text-[#6b6560] hover:text-[#f0ede8] transition-colors duration-200 px-3 py-1.5 border border-white/[0.07] hover:border-white/20 rounded-sm">
-            + Upload
-          </Link>
-
           <Link href="/quiz"
-            className="text-[11px] font-medium tracking-[0.15em] uppercase text-[#6b6560] hover:text-[#f0ede8] transition-colors duration-200 px-3 py-1.5 border border-white/[0.07] hover:border-white/20 rounded-sm">
+            className="text-[11px] font-medium tracking-[0.15em] uppercase text-[#6b6560] hover:text-[#f0ede8] transition-colors px-3 py-1.5 border border-white/[0.07] hover:border-white/20 rounded-sm">
             Quiz
           </Link>
-
+          <Link href="/upload"
+            className="hidden sm:block text-[11px] font-medium tracking-[0.15em] uppercase text-[#6b6560] hover:text-[#f0ede8] transition-colors px-3 py-1.5 border border-white/[0.07] hover:border-white/20 rounded-sm">
+            + Upload
+          </Link>
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 bg-[#e8844a] rounded-full animate-pulse" />
-            <span className="text-[11px] text-[#3a3530] hidden sm:block tracking-wider">AI Ready</span>
+            <span className="text-[11px] text-[#3a3530] hidden sm:block">AI Ready</span>
           </div>
         </div>
       </nav>
 
-      {/* Mode banner */}
+      {/* Socratic banner */}
       {mode === "socratic" && (
         <div className="relative z-10 shrink-0 bg-[#e8844a]/5 border-b border-[#e8844a]/15 px-5 sm:px-8 py-2 flex items-center gap-2">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#e8844a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
           <span className="text-[11px] text-[#e8844a] tracking-wider">
-            Socratic mode — the AI will guide you with questions rather than direct answers
+            Socratic mode — AI guides you with questions rather than direct answers
           </span>
         </div>
       )}
@@ -198,12 +185,9 @@ export default function ChatPage() {
               className="flex-1 bg-[#141414] border border-white/[0.08] focus:border-[#e8844a]/40 rounded-sm px-4 py-3 text-sm text-[#f0ede8] placeholder-[#3a3530] resize-none focus:outline-none transition-colors duration-200"
               style={{ minHeight: "48px", maxHeight: "120px" }}
             />
-            <button
-              onClick={send}
-              disabled={!input.trim() || loading}
+            <button onClick={send} disabled={!input.trim() || loading}
               className="w-12 h-12 rounded-sm flex items-center justify-center transition-all duration-200 shrink-0 disabled:opacity-25 disabled:cursor-not-allowed"
-              style={{ background: input.trim() && !loading ? "#e8844a" : "#1a1a1a" }}
-            >
+              style={{ background: input.trim() && !loading ? "#e8844a" : "#1a1a1a" }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke={input.trim() && !loading ? "#0c0c0c" : "#3a3530"}
                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

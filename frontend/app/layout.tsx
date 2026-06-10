@@ -6,7 +6,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EdgeTutor — AI Study Assistant",
+  title: "EdgeTutor",
   description: "Upload your notes and textbooks. Ask anything. Get instant AI-powered answers.",
 };
 

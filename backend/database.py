@@ -1,5 +1,4 @@
 import sqlite3
-import os
 
 DB_PATH = "edgetutor.db"
 
@@ -13,7 +12,6 @@ def init_db():
     conn = get_conn()
     cur = conn.cursor()
 
-    # Quiz attempts — every time a student finishes a quiz
     cur.execute("""
         CREATE TABLE IF NOT EXISTS quiz_attempts (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,19 +24,17 @@ def init_db():
         )
     """)
 
-    # Per-question results for each attempt
     cur.execute("""
         CREATE TABLE IF NOT EXISTS quiz_results (
             id           INTEGER PRIMARY KEY AUTOINCREMENT,
             attempt_id   INTEGER NOT NULL REFERENCES quiz_attempts(id),
             question     TEXT    NOT NULL,
-            correct      INTEGER NOT NULL,   -- 1 or 0
+            correct      INTEGER NOT NULL,
             selected     TEXT    NOT NULL,
             correct_ans  TEXT    NOT NULL
         )
     """)
 
-    # Chat sessions — every message pair saved
     cur.execute("""
         CREATE TABLE IF NOT EXISTS chat_sessions (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -15,55 +15,94 @@ def generate_quiz(topic: str, collection_name: str, num_questions: int = 5, diff
     context = get_context(topic, collection_name)
 
     difficulty_instruction = {
-        "easy":   "Questions should be straightforward recall and basic understanding.",
-        "medium": "Questions should require some reasoning and application of concepts.",
-        "hard":   "Questions should be challenging, requiring deep understanding and analysis.",
-    }.get(difficulty, "Questions should require some reasoning and application of concepts.")
+        "easy":   "straightforward recall and basic understanding.",
+        "medium": "reasoning and application of concepts.",
+        "hard":   "deep understanding and critical analysis.",
+    }.get(difficulty, "reasoning and application of concepts.")
 
-    prompt = f"""You are an exam question generator. Based ONLY on the context below, generate exactly {num_questions} multiple choice questions.
+    prompt = f"""Generate {num_questions} multiple choice questions about "{topic}".
+Difficulty: {difficulty} — {difficulty_instruction}
 
-Difficulty: {difficulty.upper()} — {difficulty_instruction}
-
-Context:
+Text to use:
 {context}
 
 Rules:
-- Each question must have exactly 4 options labeled A, B, C, D
-- Only one option is correct
-- Questions must be based strictly on the context
-- Return ONLY valid JSON, no extra text, no markdown
+- Respond with ONLY a JSON array, no extra text, no markdown, no code fences
+- Each item must have: question, options (A B C D), answer (A/B/C/D), explanation
 
-Return this exact JSON format:
-[
-  {{
-    "question": "question text here",
-    "options": {{"A": "option1", "B": "option2", "C": "option3", "D": "option4"}},
-    "answer": "A",
-    "explanation": "brief explanation why this is correct"
-  }}
-]"""
+[{{"question":"...","options":{{"A":"...","B":"...","C":"...","D":"..."}},"answer":"A","explanation":"..."}}]
+
+JSON:"""
 
     response = requests.post(
         "http://localhost:11434/api/generate",
-        json={"model": "gemma:2b", "prompt": prompt, "stream": False}
+        json={
+            "model": "gemma:2b",
+            "prompt": prompt,
+            "stream": False,
+            "options": {"temperature": 0.3, "num_predict": 2048}
+        }
     )
 
-    raw = response.json()["response"]
+    raw = response.json()["response"].strip()
     raw = re.sub(r"```json|```", "", raw).strip()
 
+    # Try 1: direct parse
+    try:
+        result = json.loads(raw)
+        if isinstance(result, list) and result:
+            return _validate(result)
+    except json.JSONDecodeError:
+        pass
+
+    # Try 2: extract array from anywhere in response
     match = re.search(r'\[.*\]', raw, re.DOTALL)
-    if not match:
-        raise ValueError("Could not parse quiz JSON from model response")
+    if match:
+        try:
+            result = json.loads(match.group())
+            if isinstance(result, list) and result:
+                return _validate(result)
+        except json.JSONDecodeError:
+            pass
 
-    return json.loads(match.group())
+    # Try 3: extract individual objects
+    objects = re.findall(r'\{[^{}]*"question"[^{}]*\}', raw, re.DOTALL)
+    if objects:
+        result = []
+        for obj in objects:
+            try:
+                result.append(json.loads(obj))
+            except json.JSONDecodeError:
+                continue
+        if result:
+            return _validate(result)
 
+    raise ValueError(f"Model did not return valid JSON. Try a different topic or fewer questions.")
+
+def _validate(questions: list) -> list:
+    valid = []
+    for q in questions:
+        if not isinstance(q, dict) or "question" not in q:
+            continue
+        if "options" not in q or not isinstance(q["options"], dict):
+            q["options"] = {"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}
+        for key in ["A", "B", "C", "D"]:
+            if key not in q["options"]:
+                q["options"][key] = f"Option {key}"
+        if "answer" not in q or q["answer"] not in ["A", "B", "C", "D"]:
+            q["answer"] = "A"
+        if "explanation" not in q:
+            q["explanation"] = ""
+        valid.append(q)
+    if not valid:
+        raise ValueError("Model returned questions in wrong format.")
+    return valid
 
 def score_answer(question: dict, selected: str) -> dict:
     correct = question["answer"].upper().strip()
     chosen = selected.upper().strip()
-    is_correct = correct == chosen
     return {
-        "correct": is_correct,
+        "correct": correct == chosen,
         "selected": chosen,
         "correct_answer": correct,
         "explanation": question.get("explanation", "")

@@ -41,16 +41,16 @@ def query_docs(question: str, collection_name: str, top_k: int = 3, mode: str = 
     context = "\n\n".join(chunks)
 
     if mode == "socratic":
-        prompt = f"""You are EdgeTutor in Socratic mode. Your job is NOT to give the answer directly.
-Instead, guide the student to discover the answer themselves by asking 1-2 thoughtful questions.
-Use hints from the context below if needed. Keep your response under 4 sentences.
+        prompt = f"""You are EdgeTutor in Socratic mode. Do NOT give the answer directly.
+Guide the student with 1-2 thoughtful questions to help them discover the answer.
+Keep your response under 4 sentences.
 
-Context from uploaded document:
+Context:
 {context}
 
 Student question: {question}
 
-Respond with guiding questions only, do not reveal the answer:"""
+Guiding questions:"""
     else:
         prompt = f"""You are EdgeTutor, an AI tutor. Use the context below to answer the student's question clearly and helpfully.
 
@@ -65,5 +65,4 @@ Answer:"""
         "http://localhost:11434/api/generate",
         json={"model": "gemma:2b", "prompt": prompt, "stream": False}
     )
-
     return response.json()["response"]

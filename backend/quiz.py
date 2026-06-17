@@ -20,24 +20,36 @@ def generate_quiz(topic: str, collection_name: str, num_questions: int = 5, diff
         "hard":   "deep understanding and critical analysis.",
     }.get(difficulty, "reasoning and application of concepts.")
 
-    prompt = f"""Generate {num_questions} multiple choice questions about "{topic}".
-Difficulty: {difficulty} — {difficulty_instruction}
+    prompt = f"""You are a quiz generator. Output ONLY a JSON array, nothing else.
 
-Text to use:
+Generate {num_questions} multiple choice questions about "{topic}" using this text:
+
 {context}
 
-Rules:
-- Respond with ONLY a JSON array, no extra text, no markdown, no code fences
-- Each item must have: question, options (A B C D), answer (A/B/C/D), explanation
+Difficulty: {difficulty} — {difficulty_instruction}
 
-[{{"question":"...","options":{{"A":"...","B":"...","C":"...","D":"..."}},"answer":"A","explanation":"..."}}]
+Output format (JSON array only, no markdown, no explanation outside JSON):
+[
+  {{
+    "question": "What is ...?",
+    "options": {{
+      "A": "First actual answer choice",
+      "B": "Second actual answer choice",
+      "C": "Third actual answer choice",
+      "D": "Fourth actual answer choice"
+    }},
+    "answer": "B",
+    "explanation": "Because ..."
+  }}
+]
 
-JSON:"""
+IMPORTANT: Write real, meaningful answer choices. Never write "Option A" or "Option B".
+Output the JSON array now:"""
 
     response = requests.post(
         "http://localhost:11434/api/generate",
         json={
-            "model": "gemma:2b",
+            "model": "llama3:latest",
             "prompt": prompt,
             "stream": False,
             "options": {"temperature": 0.3, "num_predict": 2048}
@@ -77,7 +89,7 @@ JSON:"""
         if result:
             return _validate(result)
 
-    raise ValueError(f"Model did not return valid JSON. Try a different topic or fewer questions.")
+    raise ValueError("Model did not return valid JSON. Try a different topic or fewer questions.")
 
 def _validate(questions: list) -> list:
     valid = []
@@ -85,17 +97,29 @@ def _validate(questions: list) -> list:
         if not isinstance(q, dict) or "question" not in q:
             continue
         if "options" not in q or not isinstance(q["options"], dict):
-            q["options"] = {"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}
-        for key in ["A", "B", "C", "D"]:
-            if key not in q["options"]:
-                q["options"][key] = f"Option {key}"
+            continue  # skip instead of filling with placeholders
+
+        # Skip if any option looks like a placeholder
+        options = q["options"]
+        has_placeholders = any(
+            str(v).strip().lower() in [f"option {k.lower()}", f"option{k.lower()}", "..."]
+            for k, v in options.items()
+        )
+        if has_placeholders:
+            continue  # skip bad questions entirely
+
+        # Make sure all 4 keys exist
+        if not all(key in options for key in ["A", "B", "C", "D"]):
+            continue
+
         if "answer" not in q or q["answer"] not in ["A", "B", "C", "D"]:
             q["answer"] = "A"
         if "explanation" not in q:
             q["explanation"] = ""
         valid.append(q)
+
     if not valid:
-        raise ValueError("Model returned questions in wrong format.")
+        raise ValueError("Model returned questions in wrong format. Try a simpler topic or fewer questions.")
     return valid
 
 def score_answer(question: dict, selected: str) -> dict:

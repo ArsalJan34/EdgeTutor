@@ -37,15 +37,17 @@ export default function UploadPage() {
 
   return (
     <main className="min-h-screen bg-[#0c0c0c] text-[#f0ede8] flex flex-col relative overflow-hidden">
-
       <div className="absolute bottom-0 left-0 w-[500px] h-[400px] pointer-events-none"
         style={{background: "radial-gradient(ellipse at 0% 100%, rgba(232,132,74,0.07) 0%, transparent 60%)"}} />
+      <div className="absolute top-0 right-0 w-[300px] h-[300px] pointer-events-none"
+        style={{background: "radial-gradient(ellipse at 100% 0%, rgba(232,132,74,0.03) 0%, transparent 60%)"}} />
 
       {/* NAVBAR */}
-      <nav className="relative z-20 flex items-center justify-between px-6 sm:px-10 py-5 border-b border-white/[0.06]">
+      <nav className="relative z-20 flex items-center justify-between px-6 sm:px-10 py-5 border-b border-white/[0.06] backdrop-blur-sm bg-[#0c0c0c]/80">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 flex items-center justify-center">
-            <svg width="20" height="24" viewBox="0 0 20 24" fill="none">
+          <div className="relative">
+            <div className="absolute inset-0 blur-sm opacity-50 group-hover:opacity-80 transition-opacity" style={{background:"rgba(232,132,74,0.5)"}} />
+            <svg className="relative" width="20" height="24" viewBox="0 0 20 24" fill="none">
               <path d="M10 0C10 0 15 6 15 11C15 13.76 13.21 16.08 10.7 16.79C11.13 15.95 11.38 15 11.38 14C11.38 11.5 9.5 9.5 7.5 8C7.5 8 8 11 6.5 13C5.5 14.5 4 15.5 4 17.5C4 20.54 6.69 23 10 23C13.31 23 16 20.54 16 17.5C16 14.83 14.09 12.62 11.5 12C12.2 10.67 12.5 9.17 12.5 7.5C12.5 4.81 11.09 2.5 10 0Z" fill="url(#fg2)"/>
               <defs>
                 <linearGradient id="fg2" x1="10" y1="0" x2="10" y2="24" gradientUnits="userSpaceOnUse">
@@ -58,7 +60,7 @@ export default function UploadPage() {
             style={{fontFamily: "var(--font-geist-mono)"}}>EdgeTutor</span>
         </Link>
         <Link href="/chat"
-          className="flex items-center gap-2 text-xs font-medium tracking-widest uppercase text-[#a39d97] hover:text-[#f0ede8] transition-colors duration-200 px-4 py-2 border border-white/[0.08] hover:border-white/20 rounded-sm">
+          className="flex items-center gap-2 text-xs font-medium tracking-widest uppercase text-[#6b6560] hover:text-[#f0ede8] transition-all duration-200 px-4 py-2 border border-white/[0.08] hover:border-white/20 rounded-sm hover:bg-white/[0.03]">
           Chat
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
@@ -70,30 +72,32 @@ export default function UploadPage() {
       <div className="relative z-10 flex flex-col lg:flex-row flex-1">
 
         {/* Left sidebar */}
-        <aside className="lg:w-72 xl:w-80 border-b lg:border-b-0 lg:border-r border-white/[0.06] px-6 sm:px-10 lg:px-8 py-10 lg:py-16 flex flex-col gap-8">
+        <aside className="lg:w-72 xl:w-80 border-b lg:border-b-0 lg:border-r border-white/[0.06] px-6 sm:px-10 lg:px-8 py-10 lg:py-16 flex flex-col gap-10">
           <div>
-            <p className="text-[10px] tracking-[0.25em] uppercase text-[#e8844a] mb-3">Step 01</p>
-            <h1 className="text-2xl font-black tracking-tight uppercase leading-tight text-[#f0ede8] mb-3">
+            <p className="text-[10px] tracking-[0.25em] uppercase text-[#e8844a] mb-3" style={{fontFamily:"var(--font-geist-mono)"}}>Step 01</p>
+            <h1 className="text-2xl font-black tracking-tight uppercase leading-tight text-[#f0ede8] mb-4">
               Upload<br />Material
             </h1>
-            <p className="text-[#6b6560] text-sm leading-relaxed">
+            <p className="text-[#8a8580] text-sm leading-relaxed">
               Upload any PDF lecture notes, textbooks, past papers. EdgeTutor indexes the content and makes it queryable via AI.
             </p>
           </div>
-          <div className="hidden lg:flex flex-col gap-4">
-            <p className="text-[10px] tracking-[0.2em] uppercase text-[#3a3530]">Supported Formats</p>
-            <div className="flex flex-col gap-2">
+
+          <div className="hidden lg:flex flex-col gap-5">
+            <p className="text-[10px] tracking-[0.2em] uppercase text-[#6b6560]" style={{fontFamily:"var(--font-geist-mono)"}}>Supported Formats</p>
+            <div className="flex flex-col gap-3">
               {["PDF Documents", "Up to 50 MB", "Any language"].map((item) => (
-                <div key={item} className="flex items-center gap-2.5">
-                  <div className="w-1 h-1 rounded-full bg-[#e8844a]" />
-                  <span className="text-[#6b6560] text-xs">{item}</span>
+                <div key={item} className="flex items-center gap-3">
+                  <div className="w-1 h-1 rounded-full bg-[#e8844a] shrink-0" />
+                  <span className="text-[#8a8580] text-xs">{item}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div className="hidden lg:block mt-auto pt-8 border-t border-white/[0.06]">
-            <p className="text-[10px] tracking-[0.2em] uppercase text-[#3a3530] mb-2">Next Step</p>
-            <p className="text-[#6b6560] text-xs leading-relaxed">After uploading, go to Chat to ask questions about your document.</p>
+
+          <div className="hidden lg:block mt-auto pt-8 border-t border-white/[0.05]">
+            <p className="text-[10px] tracking-[0.2em] uppercase text-[#6b6560] mb-2" style={{fontFamily:"var(--font-geist-mono)"}}>Next Step</p>
+            <p className="text-[#8a8580] text-xs leading-relaxed">After uploading, go to Chat to ask questions about your document.</p>
           </div>
         </aside>
 
@@ -104,41 +108,44 @@ export default function UploadPage() {
             onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
             onDragLeave={() => setDragOver(false)}
             onClick={() => inputRef.current?.click()}
-            className="relative border border-dashed rounded-sm p-12 sm:p-16 text-center cursor-pointer transition-all duration-300 mb-5"
+            className="relative border border-dashed rounded-sm p-12 sm:p-16 text-center cursor-pointer transition-all duration-300 mb-5 group"
             style={{
-              borderColor: dragOver ? "#e8844a" : file ? "rgba(232,132,74,0.4)" : "rgba(255,255,255,0.1)",
-              background: dragOver ? "rgba(232,132,74,0.05)" : file ? "rgba(232,132,74,0.03)" : "rgba(255,255,255,0.02)",
+              borderColor: dragOver ? "#e8844a" : file ? "rgba(232,132,74,0.35)" : "rgba(255,255,255,0.09)",
+              background: dragOver ? "rgba(232,132,74,0.06)" : file ? "rgba(232,132,74,0.03)" : "rgba(255,255,255,0.01)",
+              boxShadow: dragOver ? "inset 0 0 40px rgba(232,132,74,0.05)" : "none",
             }}
           >
+            {/* Hover overlay */}
+            <div className="absolute inset-0 bg-white/[0.01] opacity-0 group-hover:opacity-100 transition-opacity rounded-sm" />
             <input ref={inputRef} type="file" accept="application/pdf" className="hidden"
               onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
 
             {file ? (
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-14 h-14 border border-[#e8844a]/30 rounded-sm flex items-center justify-center">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e8844a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <div className="flex flex-col items-center gap-4 relative z-10">
+                <div className="w-14 h-14 border border-[#e8844a]/30 bg-[#e8844a]/5 rounded-sm flex items-center justify-center shadow-lg shadow-orange-900/20">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8844a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
                     <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
                   </svg>
                 </div>
                 <div>
                   <p className="text-[#f0ede8] font-semibold text-sm">{file.name}</p>
-                  <p className="text-[#6b6560] text-xs mt-1">{(file.size / 1024 / 1024).toFixed(2)} MB · PDF</p>
+                  <p className="text-[#8a8580] text-xs mt-1">{(file.size / 1024 / 1024).toFixed(2)} MB · PDF</p>
                 </div>
-                <p className="text-[10px] tracking-widest uppercase text-[#3a3530]">Click to change</p>
+                <p className="text-[10px] tracking-widest uppercase text-[#7a7570]">Click to change</p>
               </div>
             ) : (
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-14 h-14 border border-white/[0.08] rounded-sm flex items-center justify-center">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b6560" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <div className="flex flex-col items-center gap-4 relative z-10">
+                <div className="w-14 h-14 border border-white/[0.07] rounded-sm flex items-center justify-center group-hover:border-white/15 transition-colors">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7a7570" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:stroke-[#6b6560] transition-colors">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
                   </svg>
                 </div>
                 <div>
-                  <p className="text-[#f0ede8] font-semibold text-sm">Drop your PDF here</p>
-                  <p className="text-[#6b6560] text-xs mt-1">or click to browse files</p>
+                  <p className="text-[#6b6560] font-semibold text-sm group-hover:text-[#a39d97] transition-colors">Drop your PDF here</p>
+                  <p className="text-[#7a7570] text-xs mt-1">or click to browse files</p>
                 </div>
-                <p className="text-[10px] tracking-widest uppercase text-[#2a2520]">PDF · Max 50 MB</p>
+                <p className="text-[10px] tracking-widest uppercase text-[#6b6560]">PDF · Max 50 MB</p>
               </div>
             )}
           </div>
@@ -149,7 +156,7 @@ export default function UploadPage() {
                 ? "border border-[#e8844a]/20 bg-[#e8844a]/5 text-[#e8844a]"
                 : "border border-red-500/20 bg-red-500/5 text-red-400"
             }`}>
-              <span className="shrink-0 mt-0.5">{status === "success" ? "✓" : "✕"}</span>
+              <span className="shrink-0 mt-0.5 text-xs">{status === "success" ? "✓" : "✕"}</span>
               <span>{message}</span>
             </div>
           )}
@@ -157,10 +164,11 @@ export default function UploadPage() {
           <button
             onClick={handleUpload}
             disabled={!file || status === "uploading"}
-            className="w-full py-4 rounded-sm font-bold text-xs tracking-[0.15em] uppercase transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed mb-3"
+            className="w-full py-4 rounded-sm font-bold text-xs tracking-[0.15em] uppercase transition-all duration-200 disabled:opacity-25 disabled:cursor-not-allowed mb-3"
             style={{
-              background: (!file || status === "uploading") ? "#1a1a1a" : "#e8844a",
-              color: (!file || status === "uploading") ? "#3a3530" : "#0c0c0c",
+              background: (!file || status === "uploading") ? "#181818" : "#e8844a",
+              color: (!file || status === "uploading") ? "#7a7570" : "#0c0c0c",
+              boxShadow: (!file || status === "uploading") ? "none" : "0 4px 20px rgba(232,132,74,0.25)",
             }}
           >
             {status === "uploading" ? (
@@ -175,7 +183,7 @@ export default function UploadPage() {
 
           {status === "success" && (
             <Link href="/chat"
-              className="flex items-center justify-center gap-2 w-full py-4 rounded-sm font-bold text-xs tracking-[0.15em] uppercase border border-[#e8844a]/30 text-[#e8844a] hover:bg-[#e8844a]/5 transition-all duration-200">
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-sm font-bold text-xs tracking-[0.15em] uppercase border border-[#e8844a]/25 text-[#e8844a] hover:bg-[#e8844a]/5 hover:border-[#e8844a]/40 transition-all duration-200">
               Start Asking Questions
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>

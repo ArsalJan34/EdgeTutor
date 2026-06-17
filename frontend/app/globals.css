@@ -7,8 +7,8 @@
   --accent-dim: #c4622a;
   --surface: #141414;
   --surface-2: #1c1c1c;
-  --border: rgba(255,255,255,0.07);
-  --border-accent: rgba(232,132,74,0.3);
+  --border: rgba(255, 255, 255, 0.07);
+  --border-accent: rgba(232, 132, 74, 0.3);
   --text-muted: #6b6560;
   --text-secondary: #a39d97;
 }
@@ -36,12 +36,41 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--background); }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
 
 ::selection {
-  background: rgba(232,132,74,0.25);
+  background: rgba(232, 132, 74, 0.2);
   color: #f0ede8;
+}
+
+/* Subtle fade-in for page content */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fadeUp 0.4s ease forwards;
 }
